@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 
 import ServerConfig from './config/server.config';
 import apiRouter from './routes';
+import { isLoggedIn } from './validators/auth.validators';
 
 const app : Express = express();
 
@@ -13,7 +14,7 @@ app.use(cookieParser());
 
 app.use('/api', apiRouter);
 
-app.get('/ping', (req: Request, res: Response) => {
+app.get('/ping', isLoggedIn, (req: Request, res: Response) => {
     res.json({msg: 'ok'});
 })
 
