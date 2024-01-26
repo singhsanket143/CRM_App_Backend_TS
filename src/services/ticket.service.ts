@@ -20,11 +20,25 @@ export default class TicketService {
             if(!createdBy) {
                 throw new NotFoundError("User", "id", userId);
             }
-            ticket = await this.ticketRepository.update(ticket.id, {createdBy: createdBy.email});
+            const engineer = await this.getEngineerToAllocateTicket();
+            await this.userRepository.addAssignedTicket(engineer.id, ticket.id);
             await this.userRepository.addCreatedTicket(createdBy.id, ticket.id);
+            ticket = await this.ticketRepository.update(ticket.id, {createdBy: createdBy.email, assignedTo: engineer.email});
+
             return ticket;
         } catch(error) {
             
+            console.log(error);
+            throw error;
+        }
+    }
+
+    async getEngineerToAllocateTicket() {
+        try {
+            const engineers = await this.userRepository.getEngineers();
+            engineers.sort((engineer1, engineer2) => engineer1.ticketsAssigned.length - engineer2.ticketsAssigned.length);
+            return engineers[0];
+        } catch(error) {
             console.log(error);
             throw error;
         }

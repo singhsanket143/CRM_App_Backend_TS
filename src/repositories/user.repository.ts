@@ -1,4 +1,4 @@
-import { PrismaClient, User } from '@prisma/client'
+import { PrismaClient, User, Role } from '@prisma/client'
 import CreateUserDto from '../dtos/createUser.dto';
 const prisma = new PrismaClient()
 
@@ -29,6 +29,17 @@ class UserRepository {
         return users;
     }
 
+    async getEngineers() : Promise<User[]> {
+        const users = await prisma.user.findMany({
+            where: {
+                roles: {
+                    hasSome: [Role.ENGINEER]
+                }
+            }
+        });
+        return users;
+    }
+
     async delete() {
 
     }
@@ -40,6 +51,23 @@ class UserRepository {
             },
             data: {
                 ticketsCreated: {
+                    push: ticketId
+                }
+            }
+        });
+        return user;
+    }
+
+    async addAssignedTicket(id: string, ticketId: string) {
+        const user = await prisma.user.update({
+            where: {
+                id: id,
+                roles: {
+                    hasSome: ["ENGINEER"]
+                }
+            },
+            data: {
+                ticketsAssigned: {
                     push: ticketId
                 }
             }
