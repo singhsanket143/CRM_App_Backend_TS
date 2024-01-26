@@ -17,6 +17,8 @@ model User {
   name    String?
   password String 
   roles Role[] @default([USER])
+  ticketsAssigned String[]
+  ticketsCreated String[]
 }
 
 model Ticket {
