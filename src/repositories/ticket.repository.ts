@@ -31,8 +31,18 @@ class TicketRepository {
 
     }
 
-    async update() {
-
+    async update(id: string, updateDetails: {createdBy? : string}) {
+        console.log(updateDetails, id);
+        const ticket = await prisma.ticket.update({
+            where: {
+                id: id
+            },
+            data: {
+                createdBy: updateDetails.createdBy
+            }
+        });
+        console.log(ticket);
+        return ticket;
     }
 }
 

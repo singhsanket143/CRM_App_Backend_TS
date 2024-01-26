@@ -33,8 +33,18 @@ class UserRepository {
 
     }
 
-    async update() {
-
+    async addCreatedTicket(id: string, ticketId: string) {
+        const user = await prisma.user.update({
+            where: {
+                id
+            },
+            data: {
+                ticketsCreated: {
+                    push: ticketId
+                }
+            }
+        });
+        return user;
     }
 
     async getUserByEmail(userEmail: string) : Promise<User | null> {
