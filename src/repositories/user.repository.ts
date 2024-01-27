@@ -1,5 +1,8 @@
 import { PrismaClient, User, Role } from '@prisma/client'
 import CreateUserDto from '../dtos/createUser.dto';
+import Engineer from '../types/engineer';
+import NotFoundError from '../errors/notFound';
+import { JsonObject } from '@prisma/client/runtime/library';
 const prisma = new PrismaClient()
 
 class UserRepository {
@@ -38,6 +41,56 @@ class UserRepository {
             }
         });
         return users;
+    }
+
+    async getAvailableEngineer() : Promise<Engineer> {
+        const response = await prisma.user.aggregateRaw({
+            pipeline: [
+                {
+                    $match: {
+                        "roles": {
+                            "$in": ["ENGINEER"]
+                        }
+                    }
+                },
+                {
+                    $project: {
+                        id: 1,
+                        email: 1,
+                        ticketsAssignedCount: { 
+                            $cond: {
+                                if: { $isArray: "$ticketsAssigned" },
+                                then: { $size: "$ticketsAssigned" },
+                                else: 0
+                            }
+                         } // include a new field in every doc
+                    }
+                },
+                {
+                    $sort: {
+                        ticketsAssignedCount: 1 // sorting the documents
+                    }
+                },
+                {
+                    $limit: 1 // limit to the first doc
+                }
+            ]
+        });
+        console.log(response);
+
+        console.log(typeof response[0] === 'object', (response[0] as JsonObject)._id, (response[0] as JsonObject).email, (response[0] as JsonObject).ticketsAssignedCount)
+        if(typeof response[0] === 'object' && (response[0] as JsonObject)._id && (response[0] as JsonObject).email && (response[0] as JsonObject).ticketsAssignedCount) {
+            const idObject = ((response[0] as JsonObject)._id as {'$oid': string});
+            // _id: {'$oid' : 'asdfa' }
+            const engineer: Engineer = {
+                id: idObject['$oid'],
+                email: (response[0] as JsonObject).email as string,
+                ticketsAssignedCount: (response[0] as JsonObject).ticketsAssignedCount as number
+            };
+            console.log(engineer);
+            return engineer;
+        }
+        throw new NotFoundError("User", "role", "Engineer");
     }
 
     async delete() {

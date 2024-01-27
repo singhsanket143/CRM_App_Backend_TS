@@ -35,15 +35,15 @@ export default class TicketService {
 
     async getEngineerToAllocateTicket() {
         try {
-            const engineers = await this.userRepository.getEngineers();
-            engineers.sort((engineer1, engineer2) => engineer1.ticketsAssigned.length - engineer2.ticketsAssigned.length);
-            return engineers[0];
+            const engineer = await this.userRepository.getAvailableEngineer();
+            console.log(engineer);
+            // engineers.sort((engineer1, engineer2) => engineer1.ticketsAssigned.length - engineer2.ticketsAssigned.length);
+            // return engineers[0];
+            return engineer;
         } catch(error) {
             console.log(error);
             throw error;
         }
     }
-
-
 }
 
