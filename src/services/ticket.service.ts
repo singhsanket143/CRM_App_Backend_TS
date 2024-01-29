@@ -4,6 +4,9 @@ import CreateTicketDto from "../dtos/createTicket.dto";
 import UserRepository from "../repositories/user.repository";
 import NotFoundError from "../errors/notFound";
 import UpdateTicketDto from "../dtos/updateTicket.dto";
+import BadRequestError from "../errors/badRequest";
+import GenericError from "../errors/genericError";
+import InternalServerError from "../errors/internalServerError";
 
 export default class TicketService {
     private ticketRepository: TicketRepository;
@@ -20,12 +23,20 @@ export default class TicketService {
             /**
              * We want to make sure assignedTo always has an email of an admin or an engineer
              */
+            if(areWeUpdatingAssignedTo) {
+                if(!(await this.userRepository.isUserAdmin(ticketDetails.assignedTo) || await this.userRepository.isUserEngineer(ticketDetails.assignedTo))) {
+                    throw new BadRequestError("assignedTo email is not a valid engineer or admin")
+                }
+            }
             const updateObject = (areWeUpdatingAssignedTo) ? {...ticketDetails, updatedAt: new Date(), assignee: userEmail} : {...ticketDetails, updatedAt: new Date()};
             const ticket = await this.ticketRepository.update(ticketId, updateObject as Partial<Prisma.TicketUpdateInput>);
             return ticket;
         } catch(error) {
+            if(error instanceof BadRequestError) {
+                throw error;
+            }
             console.log(error);
-            throw error;
+            throw new InternalServerError();
         }
     }
 
@@ -43,7 +54,9 @@ export default class TicketService {
 
             return ticket;
         } catch(error) {
-            
+            if(error instanceof BadRequestError) {
+                throw error;
+            }
             console.log(error);
             throw error;
         }

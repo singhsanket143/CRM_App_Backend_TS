@@ -137,6 +137,27 @@ class UserRepository {
         return user;
     }
 
+    async isUserEngineer(userEmail: string) : Promise<boolean> {
+        const user = await prisma.user.findUnique({
+            where: {
+                email: userEmail
+            }
+        });
+        if(!user) return false;
+        return user.roles.includes("ENGINEER");
+    }
+
+    async isUserAdmin(userEmail: string) : Promise<boolean> {
+        const user = await prisma.user.findUnique({
+            where: {
+                email: userEmail
+            }
+        });
+        if(!user) return false;
+        return user.roles.includes("ADMIN");
+    }
+    
+
 }
 
 export default UserRepository;
