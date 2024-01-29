@@ -1,4 +1,4 @@
-import { PrismaClient, Ticket } from '@prisma/client';
+import { Prisma, PrismaClient, Ticket } from '@prisma/client';
 import CreateTicketDto from '../dtos/createTicket.dto';
 const prisma = new PrismaClient();
 
@@ -31,16 +31,13 @@ class TicketRepository {
 
     }
 
-    async update(id: string, updateDetails: {createdBy? : string, assignedTo? : string}) {
+    async update(id: string, updateDetails: Partial<Prisma.TicketUpdateInput>) {
         console.log(updateDetails, id);
         const ticket = await prisma.ticket.update({
             where: {
                 id: id
             },
-            data: {
-                createdBy: updateDetails.createdBy,
-                assignedTo: updateDetails.assignedTo
-            }
+            data: updateDetails
         });
         console.log(ticket);
         return ticket;

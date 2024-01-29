@@ -1,8 +1,9 @@
-import { Ticket } from "@prisma/client";
+import { Prisma, Ticket } from "@prisma/client";
 import TicketRepository from "../repositories/ticket.repository";
 import CreateTicketDto from "../dtos/createTicket.dto";
 import UserRepository from "../repositories/user.repository";
 import NotFoundError from "../errors/notFound";
+import UpdateTicketDto from "../dtos/updateTicket.dto";
 
 export default class TicketService {
     private ticketRepository: TicketRepository;
@@ -11,6 +12,21 @@ export default class TicketService {
     constructor(ticketRepository: TicketRepository, userRepository: UserRepository) {
         this.ticketRepository = ticketRepository;
         this.userRepository = userRepository; 
+    }
+
+    async updateTicket(ticketId: string, ticketDetails: UpdateTicketDto, userId: string, userEmail: string) {
+        try {
+            const areWeUpdatingAssignedTo = ticketDetails.assignedTo !== undefined;
+            /**
+             * We want to make sure assignedTo always has an email of an admin or an engineer
+             */
+            const updateObject = (areWeUpdatingAssignedTo) ? {...ticketDetails, updatedAt: new Date(), assignee: userEmail} : {...ticketDetails, updatedAt: new Date()};
+            const ticket = await this.ticketRepository.update(ticketId, updateObject as Partial<Prisma.TicketUpdateInput>);
+            return ticket;
+        } catch(error) {
+            console.log(error);
+            throw error;
+        }
     }
 
     async createTicket(ticketDetails: CreateTicketDto, userId: string) : Promise<Ticket> {
