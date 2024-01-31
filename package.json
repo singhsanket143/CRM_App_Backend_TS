@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^5.8.1",
+    "@sendgrid/mail": "^8.1.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/body-parser": "^1.19.5",
     "@types/jsonwebtoken": "^9.0.5",

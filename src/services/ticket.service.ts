@@ -5,7 +5,6 @@ import UserRepository from "../repositories/user.repository";
 import NotFoundError from "../errors/notFound";
 import UpdateTicketDto from "../dtos/updateTicket.dto";
 import BadRequestError from "../errors/badRequest";
-import GenericError from "../errors/genericError";
 import InternalServerError from "../errors/internalServerError";
 
 export default class TicketService {

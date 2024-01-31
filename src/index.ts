@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import ServerConfig from './config/server.config';
 import apiRouter from './routes';
 import { isLoggedIn } from './validators/auth.validators';
-
+import MailerService from './services/mailing.service';
 const app : Express = express();
 
 app.use(bodyParser.json());
@@ -20,4 +20,7 @@ app.get('/ping', isLoggedIn, (req: Request, res: Response) => {
 
 app.listen(ServerConfig.PORT, async () => {
     console.log(`Server started at PORT: ${ServerConfig.PORT}`);
+    const ms = new MailerService();
+    const res = await ms.sendEmail("singhsanket143@gmail.com", "Welcome to the team ! ", "<h1> Welcome to the band !! </h1>")
+    console.log(res);
 })
