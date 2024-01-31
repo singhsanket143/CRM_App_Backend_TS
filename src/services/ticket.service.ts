@@ -6,14 +6,19 @@ import NotFoundError from "../errors/notFound";
 import UpdateTicketDto from "../dtos/updateTicket.dto";
 import BadRequestError from "../errors/badRequest";
 import InternalServerError from "../errors/internalServerError";
+import MailerService from "./mailing.service";
+import { ticketCreated } from "../mailers/ticket.mailer";
+
 
 export default class TicketService {
     private ticketRepository: TicketRepository;
     private userRepository: UserRepository;
+    private mailer: MailerService;
 
     constructor(ticketRepository: TicketRepository, userRepository: UserRepository) {
         this.ticketRepository = ticketRepository;
         this.userRepository = userRepository; 
+        this.mailer = new MailerService();
     }
 
     async updateTicket(ticketId: string, ticketDetails: UpdateTicketDto, userId: string, userEmail: string) {
@@ -50,7 +55,7 @@ export default class TicketService {
             await this.userRepository.addAssignedTicket(engineer.id, ticket.id);
             await this.userRepository.addCreatedTicket(createdBy.id, ticket.id);
             ticket = await this.ticketRepository.update(ticket.id, {createdBy: createdBy.email, assignedTo: engineer.email});
-
+            this.mailer.sendEmail(ticket.createdBy || '', `Successfully created your ticket ${ticket.id}`, ticketCreated(ticket.id));
             return ticket;
         } catch(error) {
             if(error instanceof BadRequestError) {

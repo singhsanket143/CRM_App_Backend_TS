@@ -16,7 +16,7 @@ export default class MailerService {
         }
         try {
             const response = await sendgrid.send(email);  
-            console.log(response);
+            console.log(email, response);
             return {
                 message: 'MAIL SENT',
                 success: true
