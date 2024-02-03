@@ -21,7 +21,7 @@ jobs:
           node-version: ${{matrix.node-version}}
           cache: 'npm'
       - run: npm ci
-      - run: npx prisma generate
+      - run: cd src && npx prisma generate
       - run: npm run build
       - run: npm test
       - run: pm2 restart backendserver
