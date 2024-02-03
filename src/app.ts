@@ -12,7 +12,7 @@ app.use(cookieParser());
 app.use('/api', apiRouter);
 
 app.get('/ping', (req: Request, res: Response) => {
-    res.status(201).json({msg: 'ok with changes'});
+    res.status(202).json({msg: 'ok with changes'});
 });
 
 export default app;
