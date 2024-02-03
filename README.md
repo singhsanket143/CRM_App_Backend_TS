@@ -1,4 +1,4 @@
 # CI - CD
 
 CI -> Continuous Integration
-CD -> Continuous Deployment
+CD -> Continuous Deployment.
