@@ -1,0 +1,29 @@
+name: Node.JS CI
+
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  build: 
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use NodeJS ${{matrix.node-version}}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{matrix.node-version}}
+      
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup prisma client
+        run: cd src && npx prisma generate
+      
+      - name: Run tests
+        run: npm test
