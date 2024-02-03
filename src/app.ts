@@ -13,6 +13,6 @@ app.use('/api', apiRouter);
 
 app.get('/ping', (req: Request, res: Response) => {
     res.status(200).json({msg: 'ok with changes'});
-}); // something..
+}); // something....
 
 export default app;
